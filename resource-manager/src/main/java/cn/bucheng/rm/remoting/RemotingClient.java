@@ -13,10 +13,11 @@ public interface RemotingClient {
 
     /**
      * 进行远程连接
+     *
      * @param ip
      * @param port
      */
-    void connect(String ip,int port);
+    void connect(String ip, int port);
 
     /**
      * 关闭，完成基本资源释放
@@ -25,13 +26,14 @@ public interface RemotingClient {
 
     /**
      * 判断key对应的远程通道是否正常
-     * @param key
+     *
      * @return
      */
-    boolean channelActive(String key);
+    boolean channelActive();
 
     /**
      * 同步阻塞发送数据
+     *
      * @param address
      * @param command
      * @param timeoutMillis
@@ -41,5 +43,11 @@ public interface RemotingClient {
      * @throws RemotingTimeoutException
      * @throws RemotingConnectException
      */
-    void invokeSync(final RemotingCommand command,final long timeoutMillis)throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException, RemotingConnectException;
+    void invokeSync(final RemotingCommand command, final long timeoutMillis) throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException, RemotingConnectException;
+
+    /**
+     * 处理异常消息
+     * @param command
+     */
+    void handleRemotingCommand(RemotingCommand command);
 }

@@ -1,6 +1,7 @@
 package cn.bucheng.rm.remoting.netty;
 
 import cn.bucheng.rm.remoting.protocol.RemotingCommand;
+import lombok.Data;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @modified By：
  * @version:
  */
+@Data
 public class ResponseFuture {
     private String xid;
     private long timeoutMillis;
@@ -20,6 +22,7 @@ public class ResponseFuture {
     private volatile RemotingCommand command;
     private volatile boolean sendRequestOK;
     private volatile Throwable cause;
+
 
 
     public ResponseFuture(String xid,long timeoutMillis){

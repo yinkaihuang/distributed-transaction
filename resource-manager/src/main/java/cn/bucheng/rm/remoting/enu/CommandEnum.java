@@ -13,6 +13,7 @@ public enum CommandEnum {
     COMMIT(2),
     FIN(1),
     REGISTER(4),
+    ERROR(-100),
     RESPONSE(200);
     private int code;
 

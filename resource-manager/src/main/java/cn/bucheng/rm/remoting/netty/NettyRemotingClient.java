@@ -1,6 +1,7 @@
 package cn.bucheng.rm.remoting.netty;
 
 import cn.bucheng.rm.remoting.RemotingClient;
+import cn.bucheng.rm.remoting.enu.CommandEnum;
 import cn.bucheng.rm.remoting.exception.RemotingConnectException;
 import cn.bucheng.rm.remoting.exception.RemotingSendRequestException;
 import cn.bucheng.rm.remoting.exception.RemotingTimeoutException;
@@ -25,6 +26,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class NettyRemotingClient implements RemotingClient {
+    public static final int RESPONSE_CODE = 200;
+    public static final int ROLLBACK_CODE = -2;
+    public static final int COMMIT_CODE = 2;
     /**
      * 保存请求结果集
      */
@@ -32,7 +36,7 @@ public class NettyRemotingClient implements RemotingClient {
     /**
      * 保存连接成功的远程通道
      */
-    private volatile Channel remotingChannl;
+    private volatile Channel remotingChannel;
 
     private NioEventLoopGroup workGroup;
     private Bootstrap bootstrap;
@@ -62,7 +66,7 @@ public class NettyRemotingClient implements RemotingClient {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
                     log.info("connect remote channel {}:{} success", ip, port);
-                    remotingChannl = future.channel();
+                    remotingChannel = future.channel();
                     return;
                 }
                 log.warn("connect remote channel {}:{} fail,cause:", ip, port, future.cause().toString());
@@ -79,14 +83,57 @@ public class NettyRemotingClient implements RemotingClient {
         }
     }
 
-    public boolean channelActive(String key) {
-        if (remotingChannl == null || !remotingChannl.isActive())
+    public boolean channelActive() {
+        if (remotingChannel == null || !remotingChannel.isActive())
             return false;
         return true;
     }
 
     public void invokeSync(RemotingCommand command, long timeoutMillis) throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException, RemotingConnectException {
+        if (!channelActive()) {
+            throw new RemotingConnectException("远程连接 transaction manager 服务失败");
+        }
+        final ResponseFuture responseFuture = new ResponseFuture(command.getXid(), 1000 * 60 * 5);
+        try {
+            responseTable.put(command.getXid(), responseFuture);
+            remotingChannel.pipeline().writeAndFlush(command).addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (future.isSuccess()) {
+                        responseFuture.setSendRequestOK(true);
+                        return;
+                    }
+                    responseFuture.setSendRequestOK(false);
+                    responseFuture.setCause(future.cause());
+                    responseFuture.putResponse(null);
+                }
+            });
+            RemotingCommand remotingCommand = responseFuture.waitResponse();
+            if (!responseFuture.isSendRequestOK()) {
+                throw new RemotingSendRequestException("远程发送数据失败");
+            }
+            if (remotingCommand == null) {
+                throw new RemotingTimeoutException("获取数据超时");
+            }
+            if (remotingCommand.getType() != CommandEnum.RESPONSE.getCode()) {
+                throw new RuntimeException("未知响应错误");
+            }
+        } finally {
+            responseTable.remove(command.getXid());
+        }
+    }
 
+    @Override
+    public void handleRemotingCommand(RemotingCommand command) {
+        int type = command.getType();
+        switch (type) {
+            case RESPONSE_CODE:
+                break;
+            case ROLLBACK_CODE:
+                break;
+            case COMMIT_CODE:
+                break;
+        }
     }
 
 
