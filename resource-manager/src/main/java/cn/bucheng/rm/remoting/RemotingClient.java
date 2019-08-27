@@ -41,5 +41,5 @@ public interface RemotingClient {
      * @throws RemotingTimeoutException
      * @throws RemotingConnectException
      */
-    RemotingCommand invokeSync(final String address,final RemotingCommand command,final long timeoutMillis)throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException, RemotingConnectException;
+    void invokeSync(final RemotingCommand command,final long timeoutMillis)throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException, RemotingConnectException;
 }
