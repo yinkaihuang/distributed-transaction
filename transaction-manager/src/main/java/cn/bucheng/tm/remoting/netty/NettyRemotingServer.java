@@ -164,7 +164,7 @@ public class NettyRemotingServer implements RemotingServer {
                 break;
             case FIN_CODE:
                 boolean commit = isCommit(xid);
-                aysncSendRollbackOrCommit(xid, commit);
+                asyncSendRollbackOrCommit(xid, commit);
                 clear(xid);
                 sendResponse(channel, xid);
                 break;
@@ -207,7 +207,7 @@ public class NettyRemotingServer implements RemotingServer {
      * @param xid
      * @param commit
      */
-    private void aysncSendRollbackOrCommit(String xid, boolean commit) {
+    private void asyncSendRollbackOrCommit(String xid, boolean commit) {
         RemotingCommand command;
         List<Channel> channels;
         if (commit) {
