@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
@@ -72,7 +73,7 @@ public class NettyRemotingServer implements RemotingServer {
                 ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 8, 0, 1));
                 ch.pipeline().addLast(new StringDecoder());
                 ch.pipeline().addLast(new RemotingServerHandler());
-                ch.pipeline().addFirst(new StringDecoder());
+                ch.pipeline().addFirst(new StringEncoder());
                 ch.pipeline().addFirst(new LengthFieldPrepender(8));
             }
         });

@@ -28,7 +28,7 @@ public class TestAController {
         return "succcess";
     }
 
-    @RequestMapping("saveTest")
+    @RequestMapping("saveTest2")
     @GlobalTransactional
     public String saveTest2(String name, String content) {
         service.saveTest2(name, content);

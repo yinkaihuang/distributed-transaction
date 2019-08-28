@@ -1,5 +1,6 @@
 package cn.bucheng.rm.remoting.netty;
 
+import cn.bucheng.rm.constant.RemotingConstant;
 import cn.bucheng.rm.remoting.RemotingClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +46,7 @@ public class NettyClientController implements CommandLineRunner {
             public void run() {
                 if (!remotingClient.channelActive()) {
                     String[] ipAndPort = getIpAndPort();
-                    remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
+                    remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1]+ RemotingConstant.STEP));
                 }
             }
         }, 0, 10, TimeUnit.SECONDS);
