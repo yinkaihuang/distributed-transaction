@@ -221,12 +221,21 @@ public class NettyRemotingServer implements RemotingServer {
         }
     }
 
+    /**
+     * 进行远程xid相关数据清除
+     * @param xid
+     */
     private void clear(String xid) {
         errorSet.remove(xid);
         remotingChannelTable.remove(xid);
         channelTimeoutTable.remove(xid);
     }
 
+    /**
+     * 是否需要进行提交
+     * @param xid
+     * @return
+     */
     private boolean isCommit(String xid) {
         if (errorSet.contains(xid))
             return false;
