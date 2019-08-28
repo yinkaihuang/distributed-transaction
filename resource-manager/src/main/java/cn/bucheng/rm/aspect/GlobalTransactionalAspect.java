@@ -40,6 +40,11 @@ public class GlobalTransactionalAspect {
         return runGlobalTransactionalMethod(point);
     }
 
+    @Around("this(cn.bucheng.rm.annotation.GlobalTransactional) && execution( * *(..))")
+    public Object aroundGlobalTransactionalMethodAll(ProceedingJoinPoint point) throws Throwable {
+        return runGlobalTransactionalMethod(point);
+    }
+
     @SuppressWarnings("all")
     private Object runGlobalTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
         if (XidContext.existXid()) {
