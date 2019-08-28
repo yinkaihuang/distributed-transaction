@@ -12,6 +12,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Aspect
 @Component
+@Order(-Integer.MAX_VALUE)
 public class GlobalTransactionalAspect {
     public static final int REGISTER_TIMEOUT = 1000 * 10;
     public static final int FIN_TIMEOUT = 1000 * 10;

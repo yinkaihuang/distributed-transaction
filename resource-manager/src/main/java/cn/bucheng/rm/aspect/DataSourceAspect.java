@@ -1,15 +1,13 @@
 package cn.bucheng.rm.aspect;
 
-import cn.bucheng.rm.constant.RemotingConstant;
 import cn.bucheng.rm.holder.ConnectionProxyHolder;
 import cn.bucheng.rm.holder.XidContext;
 import cn.bucheng.rm.proxy.ConnectionProxy;
-import cn.bucheng.rm.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -24,6 +22,7 @@ import java.sql.Connection;
 @Slf4j
 @Component
 @Aspect
+@Order(Integer.MAX_VALUE)
 public class DataSourceAspect {
 
 
@@ -31,19 +30,14 @@ public class DataSourceAspect {
 
     @Around("execution(* *.*..getConnection(..))")
     public Object aroundConnection(ProceedingJoinPoint point) throws Throwable {
+        if(!XidContext.existXid()){
+            return point.proceed();
+        }
         Object result = point.proceed();
         if (!(result instanceof Connection))
             return result;
-        String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
-        if(Strings.isBlank(xid)){
-            xid = XidContext.getXid();
-        }
-        if(Strings.isBlank(xid)){
-            return point.proceed();
-        }
-        XidContext.putXid(xid);
         //判断是否已经代理过了,如果代理过，直接复用上次改造的数据连接对象
-        ConnectionProxyHolder.ConnectionProxyDefinition proxyDefinition = ConnectionProxyHolder.get(xid);
+        ConnectionProxyHolder.ConnectionProxyDefinition proxyDefinition = ConnectionProxyHolder.get(XidContext.getXid());
         if (proxyDefinition != null) {
             return proxyDefinition.proxy;
         }

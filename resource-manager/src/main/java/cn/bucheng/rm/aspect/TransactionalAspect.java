@@ -12,6 +12,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author ：yinchong
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Slf4j
 @Aspect
+@Order(-(Integer.MAX_VALUE-1))
 public class TransactionalAspect {
     public static final int REGISTER_TIMEOUT = 1000 * 10;
     public static final int ERROR_TIMEOUT = 1000 * 10;
