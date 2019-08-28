@@ -3,6 +3,7 @@ package cn.bucheng.rm.aspect;
 import cn.bucheng.rm.holder.ConnectionProxyHolder;
 import cn.bucheng.rm.holder.XidContext;
 import cn.bucheng.rm.proxy.ConnectionProxy;
+import cn.bucheng.rm.remoting.RemotingClient;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -25,8 +26,13 @@ import java.sql.Connection;
 @Order(Integer.MAX_VALUE)
 public class DataSourceAspect {
 
-
     public static final int TIMEOUT = 1000 * 60 * 5;
+
+    private RemotingClient client;
+
+    public DataSourceAspect(RemotingClient client){
+        this.client = client;
+    }
 
     @Around("execution(* *.*..getConnection(..))")
     public Object aroundConnection(ProceedingJoinPoint point) throws Throwable {
@@ -36,6 +42,9 @@ public class DataSourceAspect {
         Object result = point.proceed();
         if (!(result instanceof Connection))
             return result;
+        if(!client.channelActive()){
+            throw new RuntimeException("remoting tm is not active");
+        }
         //判断是否已经代理过了,如果代理过，直接复用上次改造的数据连接对象
         ConnectionProxyHolder.ConnectionProxyDefinition proxyDefinition = ConnectionProxyHolder.get(XidContext.getXid());
         if (proxyDefinition != null) {
