@@ -2,8 +2,8 @@ package cn.bucheng.server.service.impl;
 
 import cn.bucheng.server.mapper.TestAMapper;
 import cn.bucheng.server.model.po.TestDO;
-import cn.bucheng.server.remoting.IServiceB;
-import cn.bucheng.server.remoting.IServiceC;
+import cn.bucheng.server.remoting.IServerB;
+import cn.bucheng.server.remoting.IServerC;
 import cn.bucheng.server.service.ITestAService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,9 @@ import java.util.Date;
 @SuppressWarnings("all")
 public class TestAServiceImpl extends ServiceImpl<TestAMapper, TestDO> implements ITestAService {
     @Autowired
-    private IServiceC serviceC;
+    private IServerC serviceC;
     @Autowired
-    private IServiceB serviceB;
+    private IServerB serviceB;
 
     @Transactional
     public void saveTest(String name, String content) {

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version:
  */
 @FeignClient(value = "server-b")
-public interface IServiceB {
+public interface IServerB {
     @RequestMapping("/test/saveTest")
     String saveTest(@RequestParam("name") String name,@RequestParam("content") String content);
 
