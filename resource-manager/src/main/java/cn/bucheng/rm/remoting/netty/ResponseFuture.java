@@ -30,21 +30,39 @@ public class ResponseFuture {
         this.timeoutMillis = timeoutMillis;
     }
 
+    /**
+     * 等待阻塞结果响应
+     * @param timeoutMillis
+     * @return
+     * @throws InterruptedException
+     */
     public RemotingCommand waitResponse(final  long timeoutMillis) throws InterruptedException {
         countDownLatch.await(timeoutMillis, TimeUnit.MILLISECONDS);
         return command;
     }
 
+    /**
+     * 等待阻塞结果响应
+     * @return
+     * @throws InterruptedException
+     */
     public RemotingCommand waitResponse() throws InterruptedException {
         countDownLatch.await(timeoutMillis,TimeUnit.MILLISECONDS);
         return command;
     }
 
+    /**
+     * 是否阻塞
+     */
     public void release(){
         countDownLatch.countDown();
     }
 
 
+    /**
+     * 存放数据到结果集中并唤醒阻塞
+     * @param remotingCommand
+     */
     public void putResponse(final RemotingCommand remotingCommand) {
         this.command = remotingCommand;
         this.countDownLatch.countDown();
