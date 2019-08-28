@@ -37,7 +37,7 @@ public class ConnectionProxy implements Connection {
     /**
      * 真实提交
      */
-    public void realCommit() throws SQLException {
+    public void reallyCommit() throws SQLException {
         logger.info("official commit transaction ");
         connection.commit();
     }
@@ -47,7 +47,7 @@ public class ConnectionProxy implements Connection {
      *
      * @throws SQLException
      */
-    public void realRollback() throws SQLException {
+    public void reallyRollback() throws SQLException {
         logger.info("official rollback transaction");
         connection.rollback();
     }
@@ -55,7 +55,7 @@ public class ConnectionProxy implements Connection {
     /**
      * 真实关闭
      */
-    public void realClose() throws SQLException {
+    public void reallyClose() throws SQLException {
         count.decrementAndGet();
         logger.info("official close db connection");
         connection.close();
