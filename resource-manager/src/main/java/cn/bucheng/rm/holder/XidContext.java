@@ -4,7 +4,9 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.UUID;
 
-/**xid上下文，用于将同一线程处理的请求中的参数传递下去
+/**
+ * xid上下文，用于将同一线程处理的请求中的参数传递下去
+ *
  * @author ：yinchong
  * @create ：2019/8/28 9:51
  * @description：xid上下文
@@ -22,6 +24,10 @@ public class XidContext {
         String uuid = UUID.randomUUID().toString();
         xidContext.set(uuid);
         return uuid;
+    }
+
+    public static void putXid(String xid) {
+        xidContext.set(xid);
     }
 
     public static String removeXid() {

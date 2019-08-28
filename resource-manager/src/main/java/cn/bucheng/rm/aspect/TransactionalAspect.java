@@ -1,9 +1,17 @@
 package cn.bucheng.rm.aspect;
 
+import cn.bucheng.rm.constant.RemotingConstant;
+import cn.bucheng.rm.holder.XidContext;
+import cn.bucheng.rm.remoting.RemotingClient;
+import cn.bucheng.rm.remoting.enu.CommandEnum;
+import cn.bucheng.rm.remoting.protocol.RemotingCommand;
+import cn.bucheng.rm.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ：yinchong
@@ -15,9 +23,35 @@ import org.aspectj.lang.annotation.Aspect;
 @Slf4j
 @Aspect
 public class TransactionalAspect {
+    public static final int REGISTER_TIMEOUT = 1000 * 10;
+    public static final int ERROR_TIMEOUT = 1000 * 10;
+    @Autowired
+    private RemotingClient client;
 
     @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
-    public Object aroundTransactionalMethod(ProceedingJoinPoint point) {
-        return null;
+    public Object aroundTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
+        return runTransactionalMethod(point);
+    }
+
+    @SuppressWarnings("all")
+    private Object runTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
+        if (XidContext.existXid())
+            return point.proceed();
+        String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
+        if (Strings.isBlank(xid))
+            return point.proceed();
+        XidContext.putXid(xid);
+        RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
+        client.invokeSync(registerCommand, REGISTER_TIMEOUT);
+        try {
+            return point.proceed();
+        } catch (Throwable throwable) {
+            log.error(throwable.toString());
+            RemotingCommand errorCommand = new RemotingCommand(xid, CommandEnum.ERROR.getCode());
+            client.invokeSync(errorCommand, ERROR_TIMEOUT);
+            throw new RuntimeException(throwable);
+        } finally {
+            XidContext.removeXid();
+        }
     }
 }

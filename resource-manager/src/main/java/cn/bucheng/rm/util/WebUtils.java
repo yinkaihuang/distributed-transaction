@@ -8,22 +8,32 @@ import javax.servlet.http.HttpServletResponse;
 
 public class WebUtils {
 
-    private static ServletRequestAttributes getAttributes(){
+    private static ServletRequestAttributes getAttributes() {
         return (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     }
 
-    private static String getRequestToken(){
-        return getRequest().toString();
-    }
 
-    public static HttpServletRequest getRequest(){
+    public static HttpServletRequest getRequest() {
         ServletRequestAttributes attributes = getAttributes();
-        if(attributes==null)
+        if (attributes == null)
             return null;
         return attributes.getRequest();
     }
 
-    public static HttpServletResponse getResponse(){
+    public static HttpServletResponse getResponse() {
         return getAttributes().getResponse();
+    }
+
+    /**
+     * 获取请求头中内容
+     * @param key
+     * @return
+     */
+    public static String getHeaderValue(String key) {
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return null;
+        }
+        return request.getHeader(key);
     }
 }
