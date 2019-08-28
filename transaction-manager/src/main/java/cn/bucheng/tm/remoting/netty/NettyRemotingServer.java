@@ -39,7 +39,7 @@ public class NettyRemotingServer implements RemotingServer {
     public static final int REGISTER_CODE = 4;
     public static final int ERROR_CODE = -100;
     public static final int FIN_CODE = 1;
-    public static final int WAIT_EXECUTE_TIMEOUT = 1000 * 60 * 10;
+    public static final int WAIT_EXECUTE_TIMEOUT = 1000 * 60 * 5;
     private NioEventLoopGroup workGroup;
     private NioEventLoopGroup bossGroup;
     private ServerBootstrap bootstrap;

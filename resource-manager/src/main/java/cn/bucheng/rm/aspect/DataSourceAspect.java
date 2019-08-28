@@ -22,7 +22,7 @@ import java.sql.Connection;
 public class DataSourceAspect {
 
 
-    public static final int TIMEOUT = 1000 * 60 * 10;
+    public static final int TIMEOUT = 1000 * 60 * 5;
 
     @Around("execution(* *.*..getConnection(..))")
     public Object aroundConnection(ProceedingJoinPoint point) throws Throwable {
