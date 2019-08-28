@@ -29,20 +29,26 @@ public class NettyClientController implements CommandLineRunner {
     private DiscoveryClient discoveryClient;
     @Value("${remoting.tm.address}")
     private String tmName;
+
+    public NettyClientController(RemotingClient client, DiscoveryClient discoveryClient) {
+        this.remotingClient = client;
+        this.discoveryClient = discoveryClient;
+    }
+
     private static ScheduledExecutorService remotingChannelThread = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     public void run(String... args) throws Exception {
-            remotingClient.start();
-            remotingChannelThread.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    if(!remotingClient.channelActive()){
-                        String[] ipAndPort = getIpAndPort();
-                        remotingClient.connect(ipAndPort[0],Integer.parseInt(ipAndPort[1]));
-                    }
+        remotingClient.start();
+        remotingChannelThread.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                if (!remotingClient.channelActive()) {
+                    String[] ipAndPort = getIpAndPort();
+                    remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1]));
                 }
-            },0,10, TimeUnit.SECONDS);
+            }
+        }, 0, 10, TimeUnit.SECONDS);
     }
 
     private String[] getIpAndPort() {
