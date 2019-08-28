@@ -208,13 +208,12 @@ public class NettyRemotingClient implements RemotingClient {
     private class RemotingClientHandle extends SimpleChannelInboundHandler<String> {
 
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-            final RemotingCommand remotingCommand = JSON.parseObject(msg, RemotingCommand.class);
+        protected void channelRead0(ChannelHandlerContext ctx, final String msg) throws Exception {
             poolExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        handleRemotingCommand(remotingCommand);
+                        handleRemotingCommand(JSON.parseObject(msg, RemotingCommand.class));
                     } catch (SQLException e) {
                         log.error(e.toString());
                     }
