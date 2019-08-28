@@ -22,6 +22,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @version:
  */
 @Slf4j
+@Component
 public class NettyRemotingClient implements RemotingClient {
     public static final int RESPONSE_CODE = 200;
     public static final int ROLLBACK_CODE = -2;
