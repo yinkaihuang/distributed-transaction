@@ -2,6 +2,7 @@ package cn.bucheng.server.remoting;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author ：yinchong
@@ -13,5 +14,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FeignClient(value = "server-c")
 public interface IServiceC {
     @RequestMapping("/test/saveTest")
-    String saveTest(String name, String content);
+    String saveTest(@RequestParam("name") String name,@RequestParam("content") String content);
 }
