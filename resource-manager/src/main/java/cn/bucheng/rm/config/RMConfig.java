@@ -11,6 +11,7 @@ import cn.bucheng.rm.remoting.netty.NettyRemotingClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author ：yinchong
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean;
  * @modified By：
  * @version:
  */
+@Configuration
 @ConditionalOnProperty(value = "rm.global.tx.enable", matchIfMissing = true)
 public class RMConfig {
 
