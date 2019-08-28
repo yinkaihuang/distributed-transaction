@@ -24,6 +24,7 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 import java.sql.SQLException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +53,10 @@ public class NettyRemotingClient implements RemotingClient {
     private Bootstrap bootstrap;
     private ThreadPoolExecutor poolExecutor;
 
+    private Timer timer;
+
     public void start() {
+        timer = new Timer("response_table_cleaner");
         workGroup = new NioEventLoopGroup();
         TaskQueue taskQueue = new TaskQueue(10000);
         poolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 3, 10, TimeUnit.SECONDS, taskQueue);
@@ -74,6 +78,13 @@ public class NettyRemotingClient implements RemotingClient {
                         ch.pipeline().addFirst(new LengthFieldPrepender(8));
                     }
                 });
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                scanResponseTable();
+            }
+        }, 30 * 1000, 60 * 1000);
     }
 
     public void connect(final String ip, final int port) {
@@ -95,6 +106,9 @@ public class NettyRemotingClient implements RemotingClient {
         }
         if (poolExecutor != null) {
             poolExecutor.shutdown();
+        }
+        if (timer != null) {
+            timer.cancel();
         }
     }
 
@@ -150,8 +164,8 @@ public class NettyRemotingClient implements RemotingClient {
                 break;
             case ROLLBACK_CODE:
                 proxy = ConnectionProxyHolder.remove(xid);
-                if(proxy==null){
-                    log.error("not find proxy to rollback with xid:{}",xid);
+                if (proxy == null) {
+                    log.error("not find proxy to rollback with xid:{}", xid);
                     return;
                 }
                 proxy.reallyRollback();
@@ -159,14 +173,33 @@ public class NettyRemotingClient implements RemotingClient {
                 break;
             case COMMIT_CODE:
                 proxy = ConnectionProxyHolder.remove(xid);
-                if(proxy==null){
-                    log.error("not find proxy to commit with xid:{}",xid);
+                if (proxy == null) {
+                    log.error("not find proxy to commit with xid:{}", xid);
                     return;
                 }
                 proxy.reallyCommit();
                 proxy.reallyClose();
                 break;
         }
+    }
+
+    /**
+     * 定时扫描结果集和，将异常的数据移除掉防止出现内存泄漏问题
+     */
+    public void scanResponseTable() {
+        List<String> removeKeyList = new LinkedList<>();
+        for (Map.Entry<String, ResponseFuture> entry : responseTable.entrySet()) {
+            String key = entry.getKey();
+            ResponseFuture future = entry.getValue();
+            if (System.currentTimeMillis() > future.getBeginTime() + future.getTimeoutMillis() + 5000) {
+                future.release();
+                removeKeyList.add(key);
+            }
+        }
+        for (String removeKey : removeKeyList) {
+            responseTable.remove(removeKey);
+        }
+
     }
 
 
