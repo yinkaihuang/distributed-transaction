@@ -52,6 +52,7 @@ public class NettyClientController implements CommandLineRunner {
         }, 0, 10, TimeUnit.SECONDS);
     }
 
+    //获取TM中服务的Web地址的ip和端口
     private String[] getIpAndPort() {
         List<ServiceInstance> instances = discoveryClient.getInstances(tmName);
         if (instances == null || instances.size() == 0)
