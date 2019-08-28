@@ -16,8 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -43,6 +42,7 @@ public class NettyRemotingServer implements RemotingServer {
     private ServerBootstrap bootstrap;
     private ThreadPoolExecutor poolExecutor;
     private volatile Channel serverChannel;
+    private Timer timer;
     //记录xid和远程通道的对应关系
     private ConcurrentHashMap<String, List<Channel>> remotingChannelTable = new ConcurrentHashMap<String, List<Channel>>();
     //如果xid存在异常会记录再这里
@@ -51,6 +51,7 @@ public class NettyRemotingServer implements RemotingServer {
     private ConcurrentHashMap<String, RemotingDefinition> channelTimeoutTable = new ConcurrentHashMap<String, RemotingDefinition>();
 
     public void start() {
+        timer = new Timer("server-response-clear");
         TaskQueue queue = new TaskQueue(1000);
         poolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, 10, TimeUnit.SECONDS, queue);
         queue.setParent(poolExecutor);
@@ -72,9 +73,19 @@ public class NettyRemotingServer implements RemotingServer {
                 ch.pipeline().addFirst(new LengthFieldPrepender(8));
             }
         });
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                scanResponseTable();
+            }
+        }, 30 * 1000, 60 * 1000);
     }
 
     public void shutdown() {
+        if (timer != null) {
+            timer.cancel();
+        }
         if (workGroup != null) {
             workGroup.shutdownGracefully();
         }
@@ -85,6 +96,7 @@ public class NettyRemotingServer implements RemotingServer {
         if (poolExecutor != null) {
             poolExecutor.shutdown();
         }
+
     }
 
     public void bind(final int port) {
@@ -130,7 +142,6 @@ public class NettyRemotingServer implements RemotingServer {
     public void handleRemotingMessage(Channel channel, RemotingCommand remotingCommand) {
         String xid = remotingCommand.getXid();
         int type = remotingCommand.getType();
-        RemotingCommand responseCommand = null;
         switch (type) {
             case PING_CODE:
                 log.info("receive ping from remoting client");
@@ -141,19 +152,88 @@ public class NettyRemotingServer implements RemotingServer {
                     channels = initChannelsAndDefinition(xid);
                 }
                 channels.add(channel);
-                responseCommand = new RemotingCommand(xid, CommandEnum.RESPONSE.getCode());
-                invokeAsync(channel, responseCommand);
+                sendResponse(channel, xid);
                 break;
             case ERROR_CODE:
                 errorSet.add(xid);
-                responseCommand = new RemotingCommand(xid, CommandEnum.RESPONSE.getCode());
-                invokeAsync(channel, responseCommand);
+                sendResponse(channel, xid);
                 break;
             case FIN_CODE:
-
+                boolean commit = isCommit(xid);
+                aysncSendRollbackOrCommit(xid, commit);
+                clear(xid);
+                sendResponse(channel, xid);
                 break;
         }
     }
+
+    /**
+     * 扫描异常信息
+     */
+    private void scanResponseTable() {
+        List<String> removeKeyList = new LinkedList<String>();
+        for (Map.Entry<String, RemotingDefinition> entry : channelTimeoutTable.entrySet()) {
+            String xid = entry.getKey();
+            RemotingDefinition definition = entry.getValue();
+            if (System.currentTimeMillis() > definition.beginTime + definition.timeoutMillis + 5000) {
+                removeKeyList.add(xid);
+            }
+        }
+
+        for (String xid : removeKeyList) {
+            clear(xid);
+        }
+    }
+
+    /**
+     * 发送远程响应信息
+     *
+     * @param channel
+     * @param xid
+     */
+    private void sendResponse(Channel channel, String xid) {
+        RemotingCommand command;
+        command = new RemotingCommand(xid, CommandEnum.RESPONSE.getCode());
+        invokeAsync(channel, command);
+    }
+
+    /**
+     * 异步发送回滚或者提交指令
+     *
+     * @param xid
+     * @param commit
+     */
+    private void aysncSendRollbackOrCommit(String xid, boolean commit) {
+        RemotingCommand command;
+        List<Channel> channels;
+        if (commit) {
+            command = new RemotingCommand(xid, CommandEnum.COMMIT.getCode());
+        } else {
+            command = new RemotingCommand(xid, CommandEnum.ROLLBACK.getCode());
+        }
+        channels = remotingChannelTable.get(xid);
+        for (Channel temp : channels) {
+            invokeAsync(temp, command);
+        }
+    }
+
+    private void clear(String xid) {
+        errorSet.remove(xid);
+        remotingChannelTable.remove(xid);
+        channelTimeoutTable.remove(xid);
+    }
+
+    private boolean isCommit(String xid) {
+        if (errorSet.contains(xid))
+            return false;
+        List<Channel> channels = remotingChannelTable.get(xid);
+        for (Channel channel : channels) {
+            if (!channel.isActive())
+                return false;
+        }
+        return true;
+    }
+
 
     private List<Channel> initChannelsAndDefinition(String xid) {
         List<Channel> channels;
