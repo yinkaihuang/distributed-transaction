@@ -46,8 +46,8 @@ public class ConnectionProxyHolder {
     }
 
     public static class ConnectionProxyDefinition {
-        ConnectionProxy proxy;
-        long startTime = System.currentTimeMillis();
-        long timeoutMillis;
+        public ConnectionProxy proxy;
+        public long startTime = System.currentTimeMillis();
+        public long timeoutMillis;
     }
 }

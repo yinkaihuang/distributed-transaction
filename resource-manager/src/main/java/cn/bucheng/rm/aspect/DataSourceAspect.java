@@ -31,6 +31,11 @@ public class DataSourceAspect {
         Object result = point.proceed();
         if (!(result instanceof Connection))
             return result;
+        //判断是否已经代理过了,如果代理过，直接复用上次改造的数据连接对象
+        ConnectionProxyHolder.ConnectionProxyDefinition proxyDefinition = ConnectionProxyHolder.get(XidContext.getXid());
+        if (proxyDefinition != null) {
+            return proxyDefinition.proxy;
+        }
         log.info(" proxy db connection  with key:{}", XidContext.getXid());
         Connection connection = (Connection) result;
         connection.setAutoCommit(false);
