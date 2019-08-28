@@ -15,6 +15,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @version:
  */
 @Slf4j
+@Component
 public class NettyRemotingServer implements RemotingServer {
 
     public static final int PING_CODE = 0;
@@ -275,7 +277,10 @@ public class NettyRemotingServer implements RemotingServer {
         }
     }
 
-
+    /**
+     * 标记xid对应提交标记为错误
+     * @param channel
+     */
     private void markXidErrorFlag(Channel channel) {
         for (Map.Entry<String, List<Channel>> entry : remotingChannelTable.entrySet()) {
             String key = entry.getKey();
