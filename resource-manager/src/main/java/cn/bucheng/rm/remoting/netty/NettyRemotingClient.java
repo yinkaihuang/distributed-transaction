@@ -100,7 +100,7 @@ public class NettyRemotingClient implements RemotingClient {
                     remotingChannel = future.channel();
                     return;
                 }
-                log.warn("connect remote channel {}:{} fail,cause:", ip, port, future.cause().toString());
+                log.warn("connect remote channel {}:{} fail,cause:", ip, port, future.cause().getCause().toString());
             }
         });
     }
@@ -227,7 +227,7 @@ public class NettyRemotingClient implements RemotingClient {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            log.warn("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.getCause().toString());
+            log.warn("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.toString());
         }
 
         @Override
