@@ -7,13 +7,31 @@ import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionProxy implements Connection {
+    //用于记录分布式连接的使用数量
+    private static AtomicInteger count = new AtomicInteger(0);
+
+    public static int MAX_CONNECTION = 20;
+
     private Logger logger = LoggerFactory.getLogger(ConnectionProxy.class);
     private Connection connection;
 
     public ConnectionProxy(Connection connection) {
         this.connection = connection;
+        count.getAndIncrement();
+    }
+
+    /**
+     * 是否存在有效的分布式事务连接
+     *
+     * @return
+     */
+    public static boolean available() {
+        if (count.get() <= MAX_CONNECTION)
+            return true;
+        return false;
     }
 
     /**
@@ -26,6 +44,7 @@ public class ConnectionProxy implements Connection {
 
     /**
      * 真实回滚
+     *
      * @throws SQLException
      */
     public void realRollback() throws SQLException {
@@ -37,6 +56,7 @@ public class ConnectionProxy implements Connection {
      * 真实关闭
      */
     public void realClose() throws SQLException {
+        count.decrementAndGet();
         logger.info("official close db connection");
         connection.close();
     }
@@ -63,7 +83,7 @@ public class ConnectionProxy implements Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-       connection.setAutoCommit(autoCommit);
+        connection.setAutoCommit(autoCommit);
     }
 
     @Override
@@ -73,17 +93,17 @@ public class ConnectionProxy implements Connection {
 
     @Override
     public void commit() throws SQLException {
-       logger.info("commit transaction but do nothing");
+        logger.info("commit transaction but do nothing");
     }
 
     @Override
     public void rollback() throws SQLException {
-      logger.info("rollback transaction but do nothing");
+        logger.info("rollback transaction but do nothing");
     }
 
     @Override
     public void close() throws SQLException {
-      logger.info("close db connetion but do nothing");
+        logger.info("close db connetion but do nothing");
     }
 
 

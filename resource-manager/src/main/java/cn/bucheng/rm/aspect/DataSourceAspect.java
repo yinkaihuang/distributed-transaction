@@ -36,6 +36,10 @@ public class DataSourceAspect {
         if (proxyDefinition != null) {
             return proxyDefinition.proxy;
         }
+        if (!ConnectionProxy.available()) {
+            log.error("this no available tm connection");
+            throw new RuntimeException("this no available tm connection");
+        }
         log.info(" proxy db connection  with key:{}", XidContext.getXid());
         Connection connection = (Connection) result;
         connection.setAutoCommit(false);
