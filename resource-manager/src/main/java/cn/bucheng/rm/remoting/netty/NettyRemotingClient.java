@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@SuppressWarnings("all")
 public class NettyRemotingClient implements RemotingClient {
     public static final int RESPONSE_CODE = 200;
     public static final int ROLLBACK_CODE = -2;
@@ -226,7 +227,7 @@ public class NettyRemotingClient implements RemotingClient {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            log.warn("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.toString());
+            log.warn("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.getCause().toString());
         }
 
         @Override

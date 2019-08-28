@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@SuppressWarnings("all")
 public class NettyRemotingServer implements RemotingServer {
 
     public static final int PING_CODE = 0;
@@ -70,7 +71,7 @@ public class NettyRemotingServer implements RemotingServer {
         bootstrap.childOption(ChannelOption.TCP_NODELAY, true);
         bootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
             protected void initChannel(NioSocketChannel ch) throws Exception {
-                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 8, 0, 1));
+                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 8, 0, 8));
                 ch.pipeline().addLast(new StringDecoder());
                 ch.pipeline().addLast(new RemotingServerHandler());
                 ch.pipeline().addFirst(new StringEncoder());
@@ -224,6 +225,7 @@ public class NettyRemotingServer implements RemotingServer {
 
     /**
      * 进行远程xid相关数据清除
+     *
      * @param xid
      */
     private void clear(String xid) {
@@ -234,6 +236,7 @@ public class NettyRemotingServer implements RemotingServer {
 
     /**
      * 是否需要进行提交
+     *
      * @param xid
      * @return
      */
@@ -255,6 +258,7 @@ public class NettyRemotingServer implements RemotingServer {
             channels = remotingChannelTable.get(xid);
             if (channels == null) {
                 channels = new CopyOnWriteArrayList<Channel>();
+                remotingChannelTable.put(xid, channels);
                 channelTimeoutTable.put(xid, new RemotingDefinition(WAIT_EXECUTE_TIMEOUT));
             }
         }
@@ -267,6 +271,7 @@ public class NettyRemotingServer implements RemotingServer {
         protected void channelRead0(final ChannelHandlerContext ctx, final String msg) throws Exception {
             poolExecutor.execute(new Runnable() {
                 public void run() {
+                    log.info(msg);
                     handleRemotingMessage(ctx.channel(), JSON.parseObject(msg, RemotingCommand.class));
                 }
             });
@@ -291,6 +296,7 @@ public class NettyRemotingServer implements RemotingServer {
 
     /**
      * 标记xid对应提交标记为错误
+     *
      * @param channel
      */
     private void markXidErrorFlag(Channel channel) {
