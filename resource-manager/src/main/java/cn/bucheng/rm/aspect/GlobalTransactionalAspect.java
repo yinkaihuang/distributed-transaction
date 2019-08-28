@@ -31,6 +31,10 @@ public class GlobalTransactionalAspect {
     @Autowired
     private RemotingClient client;
 
+    public GlobalTransactionalAspect(RemotingClient client) {
+        this.client = client;
+    }
+
     @Around("@annotation(cn.bucheng.rm.annotation.GlobalTransactional)")
     public Object aroundGlobalTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
         return runGlobalTransactionalMethod(point);
@@ -41,13 +45,24 @@ public class GlobalTransactionalAspect {
         if (XidContext.existXid()) {
             return point.proceed();
         }
-        String token = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
-        if (!Strings.isBlank(token)) {
-            XidContext.putXid(token);
-            return point.proceed();
+        String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
+        if (!Strings.isBlank(xid)) {
+            XidContext.putXid(xid);
+            RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
+            client.invokeSync(registerCommand, REGISTER_TIMEOUT);
+            try {
+                return point.proceed();
+            } catch (Throwable throwable) {
+                log.error(throwable.toString());
+                RemotingCommand errorCommand = new RemotingCommand(xid, CommandEnum.ERROR.getCode());
+                client.invokeSync(errorCommand, ERROR_TIMEOUT);
+                throw new RuntimeException(throwable);
+            } finally {
+                XidContext.removeXid();
+            }
         }
 
-        String xid = XidContext.createAndSaveXid();
+        xid = XidContext.createAndSaveXid();
         RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
         client.invokeSync(registerCommand, REGISTER_TIMEOUT);
         try {

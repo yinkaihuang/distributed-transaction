@@ -28,6 +28,10 @@ public class TransactionalAspect {
     @Autowired
     private RemotingClient client;
 
+    public TransactionalAspect(RemotingClient client) {
+        this.client = client;
+    }
+
     @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
     public Object aroundTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
         return runTransactionalMethod(point);
