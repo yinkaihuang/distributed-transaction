@@ -100,7 +100,7 @@ public class NettyRemotingClient implements RemotingClient {
                     remotingChannel = future.channel();
                     return;
                 }
-                log.warn("connect remote channel {}:{} fail,cause:", ip, port, future.cause().getCause().toString());
+                log.warn("connect remote channel {}:{} fail,cause:", ip, port, future.cause().toString());
             }
         });
     }
