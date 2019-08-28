@@ -46,7 +46,7 @@ public class NettyClientController implements CommandLineRunner {
             public void run() {
                 if (!remotingClient.channelActive()) {
                     String[] ipAndPort = getIpAndPort();
-                    remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1]+ RemotingConstant.STEP));
+                    remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1])+RemotingConstant.STEP);
                 }
             }
         }, 0, 10, TimeUnit.SECONDS);

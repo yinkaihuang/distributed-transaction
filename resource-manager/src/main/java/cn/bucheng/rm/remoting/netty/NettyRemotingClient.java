@@ -71,6 +71,7 @@ public class NettyRemotingClient implements RemotingClient {
                 .option(ChannelOption.SO_SNDBUF, 1024 * 1024)//
                 .option(ChannelOption.SO_RCVBUF, 1024 * 1024)//
                 .option(ChannelOption.TCP_NODELAY, true)//
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,1000*5)//
                 .handler(new ChannelInitializer<NioSocketChannel>() {
                     protected void initChannel(NioSocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new IdleStateHandler(0, 0, 30, TimeUnit.SECONDS));
