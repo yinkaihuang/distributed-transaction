@@ -2,6 +2,7 @@ package cn.bucheng.tm.remoting.netty;
 
 import cn.bucheng.tm.remoting.RemotingServer;
 import cn.bucheng.tm.remoting.protocol.RemotingCommand;
+import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -65,12 +66,23 @@ public class NettyRemotingServer implements RemotingServer {
     }
 
     public boolean isActive() {
-        if(serverChannel==null||!serverChannel.isActive())
+        if (serverChannel == null || !serverChannel.isActive())
             return false;
         return true;
     }
 
     public void invokeAsync(RemotingCommand command) {
-
+        if (!isActive()) {
+            log.error("netty server not active");
+            throw new RuntimeException("netty server not active");
+        }
+        serverChannel.writeAndFlush(JSON.toJSONString(command)).addListener(new ChannelFutureListener() {
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (!future.isSuccess()) {
+                    log.error("send message to send buffer fail");
+                    throw new RuntimeException("send message fail,cause:"+ future.cause().toString());
+                }
+            }
+        });
     }
 }
