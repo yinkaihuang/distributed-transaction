@@ -17,6 +17,7 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -84,6 +85,7 @@ public class NettyRemotingServer implements RemotingServer {
         }, 30 * 1000, 60 * 1000);
     }
 
+    @PreDestroy
     public void shutdown() {
         if (timer != null) {
             timer.cancel();

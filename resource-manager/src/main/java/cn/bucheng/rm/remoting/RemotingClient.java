@@ -36,7 +36,6 @@ public interface RemotingClient {
     /**
      * 同步阻塞发送数据
      *
-     * @param address
      * @param command
      * @param timeoutMillis
      * @return

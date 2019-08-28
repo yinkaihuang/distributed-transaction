@@ -1,13 +1,12 @@
-package cn.bucheng.rm.constant;
+package cn.bucheng.tm.constant;
 
 /**
  * @author ：yinchong
- * @create ：2019/8/28 10:01
+ * @create ：2019/8/28 14:01
  * @description：
  * @modified By：
  * @version:
  */
 public class RemotingConstant {
-    public static final String REMOTING_REQUEST_HEADER ="rm_transaction_token";
     public static final int STEP = 33;
 }

@@ -24,6 +24,7 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -102,6 +103,7 @@ public class NettyRemotingClient implements RemotingClient {
         });
     }
 
+    @PreDestroy
     public void shutdown() {
         if (workGroup != null) {
             workGroup.shutdownGracefully();
