@@ -126,8 +126,11 @@ public class NettyRemotingClient implements RemotingClient {
     @Override
     public void handleRemotingCommand(RemotingCommand command) {
         int type = command.getType();
+        String xid = command.getXid();
         switch (type) {
             case RESPONSE_CODE:
+                ResponseFuture responseFuture = responseTable.get(xid);
+                responseFuture.putResponse(command);
                 break;
             case ROLLBACK_CODE:
                 break;
