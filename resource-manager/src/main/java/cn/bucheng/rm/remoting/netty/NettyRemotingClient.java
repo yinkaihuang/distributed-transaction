@@ -1,19 +1,29 @@
 package cn.bucheng.rm.remoting.netty;
 
+import cn.bucheng.rm.holder.ConnectionProxyHolder;
+import cn.bucheng.rm.proxy.ConnectionProxy;
 import cn.bucheng.rm.remoting.RemotingClient;
 import cn.bucheng.rm.remoting.enu.CommandEnum;
 import cn.bucheng.rm.remoting.exception.RemotingConnectException;
 import cn.bucheng.rm.remoting.exception.RemotingSendRequestException;
 import cn.bucheng.rm.remoting.exception.RemotingTimeoutException;
 import cn.bucheng.rm.remoting.protocol.RemotingCommand;
+import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
+import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +66,12 @@ public class NettyRemotingClient implements RemotingClient {
                 .option(ChannelOption.TCP_NODELAY, true)//
                 .handler(new ChannelInitializer<NioSocketChannel>() {
                     protected void initChannel(NioSocketChannel ch) throws Exception {
-
+                        ch.pipeline().addLast(new IdleStateHandler(0, 0, 30, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 8, 0, 8));
+                        ch.pipeline().addLast(new StringDecoder());
+                        ch.pipeline().addLast(new RemotingClientHandle());
+                        ch.pipeline().addFirst(new StringEncoder());
+                        ch.pipeline().addFirst(new LengthFieldPrepender(8));
                     }
                 });
     }
@@ -96,7 +111,7 @@ public class NettyRemotingClient implements RemotingClient {
         final ResponseFuture responseFuture = new ResponseFuture(command.getXid(), 1000 * 60 * 5);
         try {
             responseTable.put(command.getXid(), responseFuture);
-            remotingChannel.pipeline().writeAndFlush(command).addListener(new ChannelFutureListener() {
+            remotingChannel.pipeline().writeAndFlush(JSON.toJSONString(command)).addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
@@ -124,20 +139,71 @@ public class NettyRemotingClient implements RemotingClient {
     }
 
     @Override
-    public void handleRemotingCommand(RemotingCommand command) {
+    public void handleRemotingCommand(RemotingCommand command) throws SQLException {
         int type = command.getType();
         String xid = command.getXid();
+        ConnectionProxy proxy = null;
         switch (type) {
             case RESPONSE_CODE:
                 ResponseFuture responseFuture = responseTable.get(xid);
                 responseFuture.putResponse(command);
                 break;
             case ROLLBACK_CODE:
+                proxy = ConnectionProxyHolder.remove(xid);
+                if(proxy==null){
+                    log.error("not find proxy to rollback with xid:{}",xid);
+                    return;
+                }
+                proxy.reallyRollback();
+                proxy.reallyClose();
                 break;
             case COMMIT_CODE:
+                proxy = ConnectionProxyHolder.remove(xid);
+                if(proxy==null){
+                    log.error("not find proxy to commit with xid:{}",xid);
+                    return;
+                }
+                proxy.reallyCommit();
+                proxy.reallyClose();
                 break;
         }
     }
 
+
+    private class RemotingClientHandle extends SimpleChannelInboundHandler<String> {
+
+        @Override
+        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+            final RemotingCommand remotingCommand = JSON.parseObject(msg, RemotingCommand.class);
+            poolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        handleRemotingCommand(remotingCommand);
+                    } catch (SQLException e) {
+                        log.error(e.toString());
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            log.warn("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.toString());
+        }
+
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+            if (!(evt instanceof IdleStateEvent))
+                return;
+            IdleStateEvent event = (IdleStateEvent) evt;
+            switch (event.state()) {
+                case ALL_IDLE:
+                    RemotingCommand pingCommand = new RemotingCommand("", CommandEnum.PING.getCode());
+                    ctx.pipeline().writeAndFlush(pingCommand);
+                    break;
+            }
+        }
+    }
 
 }

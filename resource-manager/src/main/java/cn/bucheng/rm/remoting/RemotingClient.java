@@ -5,6 +5,8 @@ import cn.bucheng.rm.remoting.exception.RemotingSendRequestException;
 import cn.bucheng.rm.remoting.exception.RemotingTimeoutException;
 import cn.bucheng.rm.remoting.protocol.RemotingCommand;
 
+import java.sql.SQLException;
+
 public interface RemotingClient {
     /**
      * 启动，完成基本初始化工作
@@ -49,5 +51,5 @@ public interface RemotingClient {
      * 处理异常消息
      * @param command
      */
-    void handleRemotingCommand(RemotingCommand command);
+    void handleRemotingCommand(RemotingCommand command) throws SQLException;
 }
