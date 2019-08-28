@@ -19,5 +19,12 @@
         <module>server-c</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.bucheng</groupId>
+            <artifactId>resource-manager</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>
