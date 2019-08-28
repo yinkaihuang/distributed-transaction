@@ -1,6 +1,8 @@
 package cn.bucheng.tm.remoting;
 
 import cn.bucheng.tm.remoting.protocol.RemotingCommand;
+import io.netty.channel.Channel;
+
 
 public interface RemotingServer {
     /**
@@ -15,19 +17,22 @@ public interface RemotingServer {
 
     /**
      * 绑定端口进行启动
+     *
      * @param port
      */
     void bind(int port);
 
     /**
      * 判断当前服务是否活跃
+     *
      * @return
      */
     boolean isActive();
 
     /**
      * 异步调用发送数据
+     *
      * @param command
      */
-    void invokeAsync(RemotingCommand command);
+    void invokeAsync(Channel channel, RemotingCommand command);
 }
