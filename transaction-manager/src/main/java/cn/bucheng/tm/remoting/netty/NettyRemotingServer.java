@@ -152,7 +152,7 @@ public class NettyRemotingServer implements RemotingServer {
             case PING_CODE:
                 break;
             case REGISTER_CODE:
-                log.info("receive register command,xid:{}",xid);
+                log.info("receive remoting client:{} register command,xid:{}",channel.remoteAddress(),xid);
                 List<Channel> channels = remotingChannelTable.get(xid);
                 if (channels == null) {
                     channels = initChannelsAndDefinition(xid);
@@ -161,12 +161,12 @@ public class NettyRemotingServer implements RemotingServer {
                 sendResponse(channel, xid);
                 break;
             case ERROR_CODE:
-                log.info("receive error command,xid:{}",xid);
+                log.info("receive remoting client:{} error command,xid:{}",channel.remoteAddress(),xid);
                 errorSet.add(xid);
                 sendResponse(channel, xid);
                 break;
             case FIN_CODE:
-                log.info("receive fin command,xid:{}",xid);
+                log.info("receive remoting client:{} fin command,xid:{}",channel.remoteAddress(),xid);
                 boolean commit = isCommit(xid);
                 asyncSendRollbackOrCommit(xid, commit);
                 clear(xid);
