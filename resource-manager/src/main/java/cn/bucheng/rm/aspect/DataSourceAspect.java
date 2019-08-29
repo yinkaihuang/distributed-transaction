@@ -28,7 +28,12 @@ public class DataSourceAspect {
 
     public static final int TIMEOUT = 1000 * 60 * 5;
 
-
+    /**
+     * 拦截从spring容器中获取连接并进行改造
+     * @param point
+     * @return
+     * @throws Throwable
+     */
     @Around("execution(java.sql.Connection *.*..getConnection(..))")
     public Object aroundConnection(ProceedingJoinPoint point) throws Throwable {
         //普通事务

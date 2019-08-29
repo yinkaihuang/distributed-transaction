@@ -34,11 +34,22 @@ public class TransactionalAspect {
         this.client = client;
     }
 
+    /**
+     * 拦截存在Transactional的方法
+     * @param point
+     * @return
+     * @throws Throwable
+     */
     @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
     public Object aroundTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
         return runTransactionalMethod(point);
     }
 
+
+    @Around("this(org.springframework.transaction.annotation.Transactional) && execution( * *(..))")
+    public Object aroundWithTransactional(ProceedingJoinPoint joinPoint) throws Throwable {
+        return runTransactionalMethod(joinPoint);
+    }
 
     @SuppressWarnings("all")
     private Object runTransactionalMethod(ProceedingJoinPoint point) throws Throwable {

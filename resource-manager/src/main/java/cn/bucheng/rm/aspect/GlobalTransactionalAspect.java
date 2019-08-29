@@ -37,6 +37,12 @@ public class GlobalTransactionalAspect {
         this.client = client;
     }
 
+    /**
+     * 拦截方法方法上面存在GlobalTransactional
+     * @param point
+     * @return
+     * @throws Throwable
+     */
     @Around("@annotation(cn.bucheng.rm.annotation.GlobalTransactional)")
     public Object aroundGlobalTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
         return runGlobalTransactionalMethod(point);
