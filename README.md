@@ -32,11 +32,11 @@
 
 2.在服务中添加下面配置
 
-#添加配置表示开启分布式事务
+#添加配置表示开启分布式事务（可选配置默认开启）
 rm.global.tx.enable=true
-#配置tm的服务名称
+#配置tm的服务名称(必须配置）
 remoting.tm.address=tm
-#取消重复调用
+#取消重复调用(必须配置)
 ribbon.okToRetryOnAllOperations = false
 ribbon.MaxAutoRetriesNextServer = 0
 
