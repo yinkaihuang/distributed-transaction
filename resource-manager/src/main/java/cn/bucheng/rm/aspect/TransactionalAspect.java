@@ -39,10 +39,6 @@ public class TransactionalAspect {
         return runTransactionalMethod(point);
     }
 
-//    @Around("this(org.springframework.transaction.annotation.Transactional) && execution( * *(..))")
-//    public Object aroundTransactionalMethodAll(ProceedingJoinPoint point) throws Throwable {
-//        return runTransactionalMethod(point);
-//    }
 
     @SuppressWarnings("all")
     private Object runTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
