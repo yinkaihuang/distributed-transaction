@@ -2,6 +2,7 @@ package cn.bucheng.rm.remoting.netty;
 
 import cn.bucheng.rm.constant.RemotingConstant;
 import cn.bucheng.rm.remoting.RemotingClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  * @modified By：
  * @version:
  */
+@Slf4j
 @Component
 public class NettyClientController implements CommandLineRunner {
     @Autowired
@@ -55,9 +57,12 @@ public class NettyClientController implements CommandLineRunner {
     //获取TM中服务的Web地址的ip和端口
     private String[] getIpAndPort() {
         List<ServiceInstance> instances = discoveryClient.getInstances(tmName);
-        if (instances == null || instances.size() == 0)
+        if (instances == null || instances.size() == 0) {
+            log.info("{} not find instance",tmName);
             return null;
+        }
         if (instances.size() != 1) {
+            log.info("current version only support one tm");
             throw new RuntimeException("目前版本只能支持部署一个TM实例");
         }
         ServiceInstance instance = instances.get(0);

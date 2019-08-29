@@ -72,10 +72,10 @@ public class NettyRemotingClient implements RemotingClient {
                 .option(ChannelOption.SO_SNDBUF, 1024 * 1024)//
                 .option(ChannelOption.SO_RCVBUF, 1024 * 1024)//
                 .option(ChannelOption.TCP_NODELAY, true)//
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,1000*5)//
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000 * 5)//
                 .handler(new ChannelInitializer<NioSocketChannel>() {
                     protected void initChannel(NioSocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(0, 0, 30, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(0, 30, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 8, 0, 8));
                         ch.pipeline().addLast(new StringDecoder());
                         ch.pipeline().addLast(new RemotingClientHandle());
@@ -237,7 +237,7 @@ public class NettyRemotingClient implements RemotingClient {
                 return;
             IdleStateEvent event = (IdleStateEvent) evt;
             switch (event.state()) {
-                case ALL_IDLE:
+                case WRITER_IDLE:
                     RemotingCommand pingCommand = new RemotingCommand("", CommandEnum.PING.getCode());
                     ctx.pipeline().writeAndFlush(pingCommand);
                     break;
