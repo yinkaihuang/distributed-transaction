@@ -174,6 +174,7 @@ public class NettyRemotingClient implements RemotingClient {
                     log.error("not find proxy to rollback with xid:{}", xid);
                     return;
                 }
+                log.info("proxy to rollback and close with xid:{}",xid);
                 proxy.reallyRollback();
                 proxy.reallyClose();
                 break;
@@ -183,6 +184,7 @@ public class NettyRemotingClient implements RemotingClient {
                     log.error("not find proxy to commit with xid:{}", xid);
                     return;
                 }
+                log.info("proxy to commit and close with xid:{}",xid);
                 proxy.reallyCommit();
                 proxy.reallyClose();
                 break;

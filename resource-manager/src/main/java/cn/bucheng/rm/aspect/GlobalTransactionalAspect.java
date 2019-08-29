@@ -60,7 +60,7 @@ public class GlobalTransactionalAspect {
             try {
                 return point.proceed();
             } catch (Throwable throwable) {
-                log.error(throwable.toString());
+                log.error("get error from transactonal: "+throwable.toString());
                 RemotingCommand errorCommand = new RemotingCommand(xid, CommandEnum.ERROR.getCode());
                 client.invokeSync(errorCommand, ERROR_TIMEOUT);
                 throw new RuntimeException(throwable);

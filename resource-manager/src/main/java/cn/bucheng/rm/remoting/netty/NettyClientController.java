@@ -48,7 +48,9 @@ public class NettyClientController implements CommandLineRunner {
             public void run() {
                 if (!remotingClient.channelActive()) {
                     String[] ipAndPort = getIpAndPort();
-                    remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1])+RemotingConstant.STEP);
+                    if (ipAndPort != null && ipAndPort.length == 2) {
+                        remotingClient.connect(ipAndPort[0], Integer.parseInt(ipAndPort[1]) + RemotingConstant.STEP);
+                    }
                 }
             }
         }, 0, 10, TimeUnit.SECONDS);
@@ -58,7 +60,7 @@ public class NettyClientController implements CommandLineRunner {
     private String[] getIpAndPort() {
         List<ServiceInstance> instances = discoveryClient.getInstances(tmName);
         if (instances == null || instances.size() == 0) {
-            log.info("{} not find instance",tmName);
+            log.info("{} not find instance", tmName);
             return null;
         }
         if (instances.size() != 1) {
