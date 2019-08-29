@@ -13,7 +13,7 @@ public class ConnectionProxy implements Connection {
     //用于记录分布式连接的使用数量
     private static AtomicInteger count = new AtomicInteger(0);
 
-    public static int MAX_CONNECTION = 20;
+    public static int MAX_CONNECTION = 15;
 
     private Logger logger = LoggerFactory.getLogger(ConnectionProxy.class);
     private Connection connection;

@@ -152,7 +152,7 @@ public class NettyRemotingServer implements RemotingServer {
             case PING_CODE:
                 break;
             case REGISTER_CODE:
-                log.info("receive remoting client:{} register command,xid:{}",channel.remoteAddress(),xid);
+                log.info("receive remoting client:{} register command,xid:{}", channel.remoteAddress(), xid);
                 List<Channel> channels = remotingChannelTable.get(xid);
                 if (channels == null) {
                     channels = initChannelsAndDefinition(xid);
@@ -161,12 +161,12 @@ public class NettyRemotingServer implements RemotingServer {
                 sendResponse(channel, xid);
                 break;
             case ERROR_CODE:
-                log.info("receive remoting client:{} error command,xid:{}",channel.remoteAddress(),xid);
+                log.info("receive remoting client:{} error command,xid:{}", channel.remoteAddress(), xid);
                 errorSet.add(xid);
                 sendResponse(channel, xid);
                 break;
             case FIN_CODE:
-                log.info("receive remoting client:{} fin command,xid:{}",channel.remoteAddress(),xid);
+                log.info("receive remoting client:{} fin command,xid:{}", channel.remoteAddress(), xid);
                 boolean commit = isCommit(xid);
                 asyncSendRollbackOrCommit(xid, commit);
                 clear(xid);
@@ -220,6 +220,9 @@ public class NettyRemotingServer implements RemotingServer {
             command = new RemotingCommand(xid, CommandEnum.ROLLBACK.getCode());
         }
         channels = remotingChannelTable.get(xid);
+        if (channels == null) {
+            return;
+        }
         for (Channel temp : channels) {
             invokeAsync(temp, command);
         }
@@ -286,7 +289,7 @@ public class NettyRemotingServer implements RemotingServer {
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            log.info("{} jion tm success",ctx.channel().remoteAddress());
+            log.info("{} jion tm success", ctx.channel().remoteAddress());
         }
     }
 
