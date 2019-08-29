@@ -150,9 +150,9 @@ public class NettyRemotingServer implements RemotingServer {
         int type = remotingCommand.getType();
         switch (type) {
             case PING_CODE:
-                log.info("receive ping from remoting client");
                 break;
             case REGISTER_CODE:
+                log.info("receive register command,xid:{}",xid);
                 List<Channel> channels = remotingChannelTable.get(xid);
                 if (channels == null) {
                     channels = initChannelsAndDefinition(xid);
@@ -161,10 +161,12 @@ public class NettyRemotingServer implements RemotingServer {
                 sendResponse(channel, xid);
                 break;
             case ERROR_CODE:
+                log.info("receive error command,xid:{}",xid);
                 errorSet.add(xid);
                 sendResponse(channel, xid);
                 break;
             case FIN_CODE:
+                log.info("receive fin command,xid:{}",xid);
                 boolean commit = isCommit(xid);
                 asyncSendRollbackOrCommit(xid, commit);
                 clear(xid);
@@ -271,7 +273,6 @@ public class NettyRemotingServer implements RemotingServer {
         protected void channelRead0(final ChannelHandlerContext ctx, final String msg) throws Exception {
             poolExecutor.execute(new Runnable() {
                 public void run() {
-                    log.info(msg);
                     handleRemotingMessage(ctx.channel(), JSON.parseObject(msg, RemotingCommand.class));
                 }
             });
@@ -281,6 +282,11 @@ public class NettyRemotingServer implements RemotingServer {
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             log.error("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.toString());
             markXidErrorFlag(ctx.channel());
+        }
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            log.info("{} jion tm success",ctx.channel().remoteAddress());
         }
     }
 
