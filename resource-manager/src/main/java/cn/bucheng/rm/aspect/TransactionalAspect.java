@@ -51,8 +51,8 @@ public class TransactionalAspect {
             log.error("remoting tm is not active");
             throw new RuntimeException("remoting tm is not active");
         }
-        XidContext.putXid(xid);
         try {
+            XidContext.putXid(xid);
             RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
             client.invokeSync(registerCommand, REGISTER_TIMEOUT);
             return point.proceed();

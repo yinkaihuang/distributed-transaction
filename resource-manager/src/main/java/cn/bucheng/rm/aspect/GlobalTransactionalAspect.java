@@ -54,8 +54,8 @@ public class GlobalTransactionalAspect {
         }
         String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
         if (!Strings.isBlank(xid)) {
-            XidContext.putXid(xid);
             try {
+                XidContext.putXid(xid);
                 RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
                 client.invokeSync(registerCommand, REGISTER_TIMEOUT);
                 return point.proceed();
@@ -69,8 +69,8 @@ public class GlobalTransactionalAspect {
             }
         }
 
-        xid = XidContext.createAndSaveXid();
         try {
+            xid = XidContext.createAndSaveXid();
             RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
             client.invokeSync(registerCommand, REGISTER_TIMEOUT);
             return point.proceed();
