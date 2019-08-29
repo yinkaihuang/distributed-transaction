@@ -30,8 +30,8 @@ public class RMConfig {
     }
 
     @Bean
-    public DataSourceAspect dataSourceAspect(RemotingClient client) {
-        return new DataSourceAspect(client);
+    public DataSourceAspect dataSourceAspect() {
+        return new DataSourceAspect();
     }
 
     @Bean

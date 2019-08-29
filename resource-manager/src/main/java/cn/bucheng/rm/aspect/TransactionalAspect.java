@@ -51,6 +51,10 @@ public class TransactionalAspect {
         String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
         if (Strings.isBlank(xid))
             return point.proceed();
+        if(!client.channelActive()){
+            log.error("remoting tm is not active");
+            throw new RuntimeException("remoting tm is not active");
+        }
         XidContext.putXid(xid);
         RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
         client.invokeSync(registerCommand, REGISTER_TIMEOUT);

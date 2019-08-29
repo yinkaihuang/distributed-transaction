@@ -42,15 +42,15 @@ public class GlobalTransactionalAspect {
         return runGlobalTransactionalMethod(point);
     }
 
-//    @Around("this(cn.bucheng.rm.annotation.GlobalTransactional) && execution( * *(..))")
-//    public Object aroundGlobalTransactionalMethodAll(ProceedingJoinPoint point) throws Throwable {
-//        return runGlobalTransactionalMethod(point);
-//    }
 
     @SuppressWarnings("all")
     private Object runGlobalTransactionalMethod(ProceedingJoinPoint point) throws Throwable {
         if (XidContext.existXid()) {
             return point.proceed();
+        }
+        if(!client.channelActive()){
+            log.error("remoting tm is not active");
+            throw new RuntimeException("remoting tm is not active");
         }
         String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
         if (!Strings.isBlank(xid)) {

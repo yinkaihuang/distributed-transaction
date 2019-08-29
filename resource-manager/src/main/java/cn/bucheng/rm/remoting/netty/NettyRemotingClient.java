@@ -227,6 +227,7 @@ public class NettyRemotingClient implements RemotingClient {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            remotingChannel = null;
             log.warn("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.toString());
         }
 

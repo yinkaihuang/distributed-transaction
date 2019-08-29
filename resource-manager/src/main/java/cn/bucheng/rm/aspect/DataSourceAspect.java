@@ -28,23 +28,15 @@ public class DataSourceAspect {
 
     public static final int TIMEOUT = 1000 * 60 * 5;
 
-    private RemotingClient client;
-
-    public DataSourceAspect(RemotingClient client){
-        this.client = client;
-    }
 
     @Around("execution(* *.*..getConnection(..))")
     public Object aroundConnection(ProceedingJoinPoint point) throws Throwable {
-        if(!XidContext.existXid()){
+        if (!XidContext.existXid()) {
             return point.proceed();
         }
         Object result = point.proceed();
         if (!(result instanceof Connection))
             return result;
-        if(!client.channelActive()){
-            throw new RuntimeException("remoting tm is not active");
-        }
         //判断是否已经代理过了,如果代理过，直接复用上次改造的数据连接对象
         ConnectionProxyHolder.ConnectionProxyDefinition proxyDefinition = ConnectionProxyHolder.get(XidContext.getXid());
         if (proxyDefinition != null) {
