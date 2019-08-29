@@ -237,7 +237,7 @@ public class NettyRemotingClient implements RemotingClient {
                 return;
             IdleStateEvent event = (IdleStateEvent) evt;
             switch (event.state()) {
-                case WRITER_IDLE:
+                case ALL_IDLE:
                     RemotingCommand pingCommand = new RemotingCommand("", CommandEnum.PING.getCode());
                     ctx.pipeline().writeAndFlush(JSON.toJSONString(pingCommand));
                     break;
