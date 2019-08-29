@@ -42,3 +42,8 @@ remoting.tm.address=tm
 4.在微服务入口的方法添加@GlobalTransacitonal注解(如果是service还需要添加Transactional配合使用)
 总之大的事务还是需要依赖原理小的事务构成
 ```
+
+## demo
+```
+请查看demo模块的readme使用
+```

@@ -13,18 +13,18 @@
 >>启动server-c
 
 4.调用测试接口
-接口1：
+接口2：
 http://127.0.0.1:8383/test/saveTest2?name=yinchong&content=test
 
-接口2：
+接口1：
 http://127.0.0.1:8383/test/saveTest?name=yinchong&content=test
 
 5.查看server_a.t_test/server_b.t_test/server_c.t_test 查看数据是否一致
 
 ```
 
-## :接口1流程图
+## 接口2流程图
 ![](https://github.com/yinbucheng/mypic/blob/master/%E6%8E%A5%E5%8F%A31%E6%B5%81%E7%A8%8B.png?raw=true)
 
-## 接口2流程图
+## 接口1流程图
 ![](https://github.com/yinbucheng/mypic/blob/master/%E6%8E%A5%E5%8F%A32.png?raw=true)
