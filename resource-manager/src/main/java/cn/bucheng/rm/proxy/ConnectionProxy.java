@@ -90,7 +90,6 @@ public class ConnectionProxy implements Connection {
 
     @Override
     public void commit() throws SQLException {
-        logger.info("commit transaction but do nothing");
     }
 
     @Override
