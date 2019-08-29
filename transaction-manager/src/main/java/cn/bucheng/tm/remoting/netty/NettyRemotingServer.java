@@ -42,6 +42,7 @@ public class NettyRemotingServer implements RemotingServer {
     public static final int ERROR_CODE = -100;
     public static final int FIN_CODE = 1;
     public static final int WAIT_EXECUTE_TIMEOUT = 1000 * 60 * 5;
+    public static final int MAX_TASK_QUEUE = 2000;
     private NioEventLoopGroup workGroup;
     private NioEventLoopGroup bossGroup;
     private ServerBootstrap bootstrap;
@@ -57,7 +58,7 @@ public class NettyRemotingServer implements RemotingServer {
 
     public void start() {
         timer = new Timer("server-response-clear");
-        TaskQueue queue = new TaskQueue(Integer.MAX_VALUE);
+        TaskQueue queue = new TaskQueue(MAX_TASK_QUEUE);
         poolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, 10, TimeUnit.SECONDS, queue);
         queue.setParent(poolExecutor);
         workGroup = new NioEventLoopGroup();

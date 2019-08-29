@@ -20,6 +20,9 @@ http://127.0.0.1:8383/test/saveTest2?name=yinchong&content=test
 http://127.0.0.1:8383/test/saveTest?name=yinchong&content=test
 
 5.查看server_a.t_test/server_b.t_test/server_c.t_test 查看数据是否一致
+select count(*) from server_a.t_test;
+select count(*) from server_b.t_test;
+select count(*) from server_c.t_test;
 
 ```
 
