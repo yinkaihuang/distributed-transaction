@@ -38,7 +38,6 @@ public class ConnectionProxy implements Connection {
      * 真实提交
      */
     public void reallyCommit() throws SQLException {
-        logger.info("official commit transaction ");
         connection.commit();
     }
 
@@ -48,7 +47,6 @@ public class ConnectionProxy implements Connection {
      * @throws SQLException
      */
     public void reallyRollback() throws SQLException {
-        logger.info("official rollback transaction");
         connection.rollback();
     }
 
@@ -57,7 +55,6 @@ public class ConnectionProxy implements Connection {
      */
     public void reallyClose() throws SQLException {
         count.decrementAndGet();
-        logger.info("official close db connection");
         connection.close();
     }
 
@@ -98,12 +95,10 @@ public class ConnectionProxy implements Connection {
 
     @Override
     public void rollback() throws SQLException {
-        logger.info("rollback transaction but do nothing");
     }
 
     @Override
     public void close() throws SQLException {
-        logger.info("close db connetion but do nothing");
     }
 
 
