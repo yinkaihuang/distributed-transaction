@@ -36,6 +36,10 @@
 rm.global.tx.enable=true
 #配置tm的服务名称
 remoting.tm.address=tm
+#取消重复调用
+ribbon.okToRetryOnAllOperations = false
+ribbon.MaxAutoRetriesNextServer = 0
+
 
 3.启动transaction-manager
 
