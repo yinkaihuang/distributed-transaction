@@ -60,7 +60,7 @@ public class TestAServiceImpl extends ServiceImpl<TestAMapper, TestDO> implement
             throw new RuntimeException("更新数据失败");
         }
         String result = serviceB.saveTest2(name, content);
-        if ("success".equals(result)) {
+        if (!"success".equals(result)) {
             throw new RuntimeException("更新数据失败");
         }
     }
