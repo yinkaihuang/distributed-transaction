@@ -57,7 +57,7 @@ public class NettyRemotingServer implements RemotingServer {
 
     public void start() {
         timer = new Timer("server-response-clear");
-        TaskQueue queue = new TaskQueue(1000);
+        TaskQueue queue = new TaskQueue(Integer.MAX_VALUE);
         poolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, 10, TimeUnit.SECONDS, queue);
         queue.setParent(poolExecutor);
         workGroup = new NioEventLoopGroup();

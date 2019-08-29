@@ -48,19 +48,19 @@ public class GlobalTransactionalAspect {
         if (XidContext.existXid()) {
             return point.proceed();
         }
-        if(!client.channelActive()){
+        if (!client.channelActive()) {
             log.error("remoting tm is not active");
             throw new RuntimeException("remoting tm is not active");
         }
         String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
         if (!Strings.isBlank(xid)) {
             XidContext.putXid(xid);
-            RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
-            client.invokeSync(registerCommand, REGISTER_TIMEOUT);
             try {
+                RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
+                client.invokeSync(registerCommand, REGISTER_TIMEOUT);
                 return point.proceed();
             } catch (Throwable throwable) {
-                log.error("get error from transactonal: "+throwable.toString());
+                log.error("get error from transactonal: " + throwable.toString());
                 RemotingCommand errorCommand = new RemotingCommand(xid, CommandEnum.ERROR.getCode());
                 client.invokeSync(errorCommand, ERROR_TIMEOUT);
                 throw new RuntimeException(throwable);
@@ -70,12 +70,12 @@ public class GlobalTransactionalAspect {
         }
 
         xid = XidContext.createAndSaveXid();
-        RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
-        client.invokeSync(registerCommand, REGISTER_TIMEOUT);
         try {
+            RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
+            client.invokeSync(registerCommand, REGISTER_TIMEOUT);
             return point.proceed();
         } catch (Throwable throwable) {
-            log.error("get error from transactonal: "+throwable.toString());
+            log.error("get error from transactonal: " + throwable.toString());
             RemotingCommand errorCommand = new RemotingCommand(xid, CommandEnum.ERROR.getCode());
             client.invokeSync(errorCommand, ERROR_TIMEOUT);
             throw new RuntimeException(throwable);

@@ -23,7 +23,7 @@ import org.springframework.core.annotation.Order;
  */
 @Slf4j
 @Aspect
-@Order(-(Integer.MAX_VALUE-1))
+@Order(-(Integer.MAX_VALUE - 1))
 public class TransactionalAspect {
     public static final int REGISTER_TIMEOUT = 1000 * 10;
     public static final int ERROR_TIMEOUT = 1000 * 10;
@@ -47,17 +47,17 @@ public class TransactionalAspect {
         String xid = WebUtils.getHeaderValue(RemotingConstant.REMOTING_REQUEST_HEADER);
         if (Strings.isBlank(xid))
             return point.proceed();
-        if(!client.channelActive()){
+        if (!client.channelActive()) {
             log.error("remoting tm is not active");
             throw new RuntimeException("remoting tm is not active");
         }
         XidContext.putXid(xid);
-        RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
-        client.invokeSync(registerCommand, REGISTER_TIMEOUT);
         try {
+            RemotingCommand registerCommand = new RemotingCommand(xid, CommandEnum.REGISTER.getCode());
+            client.invokeSync(registerCommand, REGISTER_TIMEOUT);
             return point.proceed();
         } catch (Throwable throwable) {
-            log.error("get error from transactonal: "+throwable.toString());
+            log.error("get error from transactonal: " + throwable.toString());
             RemotingCommand errorCommand = new RemotingCommand(xid, CommandEnum.ERROR.getCode());
             client.invokeSync(errorCommand, ERROR_TIMEOUT);
             throw new RuntimeException(throwable);
