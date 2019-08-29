@@ -280,7 +280,7 @@ public class NettyRemotingServer implements RemotingServer {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            log.error("{} happen error,cause:{}", ctx.channel().remoteAddress(), cause.toString());
+            log.error("{} leave tm ,cause:{}", ctx.channel().remoteAddress(), cause.toString());
             markXidErrorFlag(ctx.channel());
         }
 
