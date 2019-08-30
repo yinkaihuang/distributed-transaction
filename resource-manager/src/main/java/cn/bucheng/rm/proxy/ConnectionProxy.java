@@ -16,7 +16,7 @@ public class ConnectionProxy implements Connection {
 
     public static int DEFAULT_MAX_NUMBER = 15;
 
-    private static volatile int MAX_NUMBER;
+    private static  int MAX_NUMBER;
 
     private Logger logger = LoggerFactory.getLogger(ConnectionProxy.class);
     private Connection connection;
