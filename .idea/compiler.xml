@@ -6,12 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="register" />
-        <module name="resource-manager" />
-        <module name="server-a" />
-        <module name="server-b" />
         <module name="server-c" />
+        <module name="server-b" />
+        <module name="server-a" />
+        <module name="register" />
         <module name="transaction-manager" />
+        <module name="resource-manager" />
       </profile>
     </annotationProcessing>
   </component>
