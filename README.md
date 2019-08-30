@@ -34,6 +34,9 @@
 
 #添加配置表示开启分布式事务（可选配置默认开启）
 rm.global.tx.enable=true
+#添加配置分布式事务最大并发数量(默认为15)
+rm.global.tx.number=20(建议最大配置不要超过总连接数一般)
+
 #配置tm的服务名称(必须配置）
 remoting.tm.address=tm
 #取消重复调用(必须配置)

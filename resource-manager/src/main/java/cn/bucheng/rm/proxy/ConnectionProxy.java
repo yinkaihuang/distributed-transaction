@@ -1,5 +1,6 @@
 package cn.bucheng.rm.proxy;
 
+import cn.bucheng.rm.aware.SpringEnvironmentAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,9 @@ public class ConnectionProxy implements Connection {
     //用于记录分布式连接的使用数量
     private static AtomicInteger count = new AtomicInteger(0);
 
-    public static int MAX_CONNECTION = 15;
+    public static int DEFAULT_MAX_NUMBER = 15;
+
+    private static volatile int MAX_NUMBER;
 
     private Logger logger = LoggerFactory.getLogger(ConnectionProxy.class);
     private Connection connection;
@@ -21,6 +24,14 @@ public class ConnectionProxy implements Connection {
     public ConnectionProxy(Connection connection) {
         this.connection = connection;
         count.getAndIncrement();
+        if (MAX_NUMBER == 0) {
+            synchronized (ConnectionProxy.class) {
+                if (MAX_NUMBER == 0) {
+                    MAX_NUMBER = SpringEnvironmentAware.getIntValue("rm.global.tx.number", DEFAULT_MAX_NUMBER);
+                    logger.info("init max tm connection number:{}",MAX_NUMBER);
+                }
+            }
+        }
     }
 
     /**
@@ -29,7 +40,7 @@ public class ConnectionProxy implements Connection {
      * @return
      */
     public static boolean available() {
-        if (count.get() <= MAX_CONNECTION)
+        if (count.get() <= MAX_NUMBER)
             return true;
         return false;
     }

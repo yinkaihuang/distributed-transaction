@@ -1,5 +1,6 @@
 package cn.bucheng.rm.aware;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 
@@ -20,5 +21,12 @@ public class SpringEnvironmentAware implements EnvironmentAware {
 
     public static String getValue(String key) {
         return environment.getProperty(key);
+    }
+
+    public static Integer getIntValue(String key, int defaultValue) {
+        String value = getValue(key);
+        if (Strings.isBlank(value))
+            return defaultValue;
+        return Integer.parseInt(value);
     }
 }
