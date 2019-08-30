@@ -4,7 +4,7 @@ import cn.bucheng.rm.aspect.DataSourceAspect;
 import cn.bucheng.rm.aspect.GlobalTransactionalAspect;
 import cn.bucheng.rm.aspect.TransactionalAspect;
 import cn.bucheng.rm.cleaner.ConnectionTimoutCleaner;
-import cn.bucheng.rm.feign.FeignRequestInterceptor;
+import cn.bucheng.rm.intercept.feign.FeignRequestInterceptor;
 import cn.bucheng.rm.remoting.RemotingClient;
 import cn.bucheng.rm.remoting.netty.NettyClientController;
 import cn.bucheng.rm.remoting.netty.NettyRemotingClient;

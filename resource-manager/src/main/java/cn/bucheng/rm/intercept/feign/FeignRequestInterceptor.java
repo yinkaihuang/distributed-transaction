@@ -1,4 +1,4 @@
-package cn.bucheng.rm.feign;
+package cn.bucheng.rm.intercept.feign;
 
 import cn.bucheng.rm.constant.RemotingConstant;
 import cn.bucheng.rm.holder.XidContext;
