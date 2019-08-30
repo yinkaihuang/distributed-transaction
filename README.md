@@ -44,9 +44,9 @@ ribbon.MaxAutoRetriesNextServer = 0
 确认使用的spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 在mysql的url配置最后面加上：&statementInterceptors=cn.bucheng.rm.intercept.mysql.MySQLIntercept
 
-3.启动transaction-manager
+4.启动transaction-manager
 
-4.在微服务入口的方法添加@GlobalTransacitonal注解(如果是service还需要添加Transactional配合使用)
+5.在微服务入口的方法添加@GlobalTransacitonal注解(如果是service还需要添加Transactional配合使用)
 总之大的事务还是需要依赖原理小的事务构成
 ```
 
