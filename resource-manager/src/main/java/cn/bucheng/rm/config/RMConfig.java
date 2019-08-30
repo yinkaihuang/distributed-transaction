@@ -3,6 +3,7 @@ package cn.bucheng.rm.config;
 import cn.bucheng.rm.aspect.DataSourceAspect;
 import cn.bucheng.rm.aspect.GlobalTransactionalAspect;
 import cn.bucheng.rm.aspect.TransactionalAspect;
+import cn.bucheng.rm.aware.SpringEnvironmentAware;
 import cn.bucheng.rm.cleaner.ConnectionTimoutCleaner;
 import cn.bucheng.rm.intercept.feign.FeignRequestInterceptor;
 import cn.bucheng.rm.remoting.RemotingClient;
@@ -45,18 +46,23 @@ public class RMConfig {
     }
 
     @Bean
-    public ConnectionTimoutCleaner connectionTimoutCleaner(){
+    public ConnectionTimoutCleaner connectionTimoutCleaner() {
         return new ConnectionTimoutCleaner();
     }
 
     @Bean
-    public FeignRequestInterceptor feignRequestInterceptor(){
+    public FeignRequestInterceptor feignRequestInterceptor() {
         return new FeignRequestInterceptor();
     }
 
     @Bean
-    public NettyClientController clientController(RemotingClient client, DiscoveryClient discoveryClient){
-        return new NettyClientController(client,discoveryClient);
+    public NettyClientController clientController(RemotingClient client, DiscoveryClient discoveryClient) {
+        return new NettyClientController(client, discoveryClient);
+    }
+
+    @Bean
+    public SpringEnvironmentAware springEnvironmentAware() {
+        return new SpringEnvironmentAware();
     }
 
 }

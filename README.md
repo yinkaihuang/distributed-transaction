@@ -40,6 +40,9 @@ remoting.tm.address=tm
 ribbon.okToRetryOnAllOperations = false
 ribbon.MaxAutoRetriesNextServer = 0
 
+3.mysql拦截配置
+确认使用的spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+在mysql的url配置最后面加上：&statementInterceptors=cn.bucheng.rm.intercept.mysql.MySQLIntercept
 
 3.启动transaction-manager
 
