@@ -16,23 +16,16 @@ public class ConnectionProxy implements Connection {
 
     public static int DEFAULT_MAX_NUMBER = 15;
 
-    private static  int MAX_NUMBER;
+    private static int MAX_NUMBER;
 
-    private Logger logger = LoggerFactory.getLogger(ConnectionProxy.class);
+    private static Logger logger = LoggerFactory.getLogger(ConnectionProxy.class);
     private Connection connection;
 
     public ConnectionProxy(Connection connection) {
         this.connection = connection;
         count.getAndIncrement();
-        if (MAX_NUMBER == 0) {
-            synchronized (ConnectionProxy.class) {
-                if (MAX_NUMBER == 0) {
-                    MAX_NUMBER = SpringEnvironmentAware.getIntValue("rm.global.tx.number", DEFAULT_MAX_NUMBER);
-                    logger.info("init max tm connection number:{}",MAX_NUMBER);
-                }
-            }
-        }
     }
+
 
     /**
      * 是否存在有效的分布式事务连接
@@ -40,9 +33,25 @@ public class ConnectionProxy implements Connection {
      * @return
      */
     public static boolean available() {
-        if (count.get() <= MAX_NUMBER)
+        initMaxNumber();
+        if (count.get() <= MAX_NUMBER) {
             return true;
+        }
         return false;
+    }
+
+    /**
+     * 初始化最大连接数量
+     */
+    private static void initMaxNumber() {
+        if (MAX_NUMBER == 0) {
+            synchronized (ConnectionProxy.class) {
+                if (MAX_NUMBER == 0) {
+                    MAX_NUMBER = SpringEnvironmentAware.getIntValue("rm.global.tx.number", DEFAULT_MAX_NUMBER);
+                    logger.info("init max tm connection number:{}", MAX_NUMBER);
+                }
+            }
+        }
     }
 
     /**
