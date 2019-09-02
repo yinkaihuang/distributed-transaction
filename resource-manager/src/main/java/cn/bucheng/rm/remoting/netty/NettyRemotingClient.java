@@ -159,7 +159,7 @@ public class NettyRemotingClient implements RemotingClient {
     }
 
     @Override
-    public void handleRemotingCommand(RemotingCommand command) throws SQLException {
+    public void handleRemotingCommand(RemotingCommand command) {
         int type = command.getType();
         String xid = command.getXid();
         ConnectionProxy proxy = null;
@@ -174,9 +174,13 @@ public class NettyRemotingClient implements RemotingClient {
                     log.error("not find proxy to rollback with xid:{}", xid);
                     return;
                 }
-                log.info("proxy to rollback and close with xid:{}", xid);
-                proxy.reallyRollback();
-                proxy.reallyClose();
+                try {
+                    proxy.reallyRollback();
+                    proxy.reallyClose();
+                    log.info("xid:{} really rollback and close success", xid);
+                } catch (SQLException e) {
+                    log.error("xid:{} really rollback and close fail", xid);
+                }
                 break;
             case COMMIT_CODE:
                 proxy = ConnectionProxyHolder.remove(xid);
@@ -184,9 +188,14 @@ public class NettyRemotingClient implements RemotingClient {
                     log.error("not find proxy to commit with xid:{}", xid);
                     return;
                 }
-                log.info("proxy to commit and close with xid:{}", xid);
-                proxy.reallyCommit();
-                proxy.reallyClose();
+                try {
+                    proxy.reallyCommit();
+                    proxy.reallyClose();
+                    log.info("xid:{} really commit and close success", xid);
+                } catch (SQLException e) {
+                    log.error("xid:{} really commit and close fail", xid);
+                }
+
                 break;
         }
     }
@@ -218,11 +227,7 @@ public class NettyRemotingClient implements RemotingClient {
             poolExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        handleRemotingCommand(JSON.parseObject(msg, RemotingCommand.class));
-                    } catch (SQLException e) {
-                        log.error(e.toString());
-                    }
+                    handleRemotingCommand(JSON.parseObject(msg, RemotingCommand.class));
                 }
             });
         }

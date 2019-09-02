@@ -33,16 +33,12 @@ public class ConnectionTimoutCleaner implements CommandLineRunner {
         remotingChannelThread.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                try {
-                    timeoutConnectionClean();
-                } catch (SQLException e) {
-                    log.error(e.toString());
-                }
+                timeoutConnectionClean();
             }
         }, 30, 60, TimeUnit.SECONDS);
     }
 
-    private void timeoutConnectionClean() throws SQLException {
+    private void timeoutConnectionClean() {
         Set<Map.Entry<String, ConnectionProxyHolder.ConnectionProxyDefinition>> entries = ConnectionProxyHolder.entrySet();
         List<String> removeKeyList = new LinkedList<>();
         for (Map.Entry<String, ConnectionProxyHolder.ConnectionProxyDefinition> entry : entries) {
@@ -56,8 +52,13 @@ public class ConnectionTimoutCleaner implements CommandLineRunner {
         for (String key : removeKeyList) {
             ConnectionProxy proxy = ConnectionProxyHolder.remove(key);
             if (proxy != null) {
-                proxy.reallyRollback();
-                proxy.reallyClose();
+                try {
+                    proxy.reallyRollback();
+                    proxy.reallyClose();
+                    log.info("xid:{} really rollback and close success", key);
+                } catch (SQLException e) {
+                    log.info("xid:{} really rollback and close fail", key);
+                }
             }
         }
     }
