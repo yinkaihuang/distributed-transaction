@@ -43,7 +43,7 @@ remoting.tm.address=tm
 ribbon.okToRetryOnAllOperations = false
 ribbon.MaxAutoRetriesNextServer = 0
 
-3.mysql拦截配置
+3.mysql拦截配置(支持最新的mysql配置)
 >>java-mysql驱动5及以下版本配置如下
 确认使用的spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 在mysql的url配置最后面加上：&statementInterceptors=cn.bucheng.rm.intercept.mysql.MySQLIntercept
