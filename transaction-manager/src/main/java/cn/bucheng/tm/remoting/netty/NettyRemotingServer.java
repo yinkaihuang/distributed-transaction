@@ -196,6 +196,7 @@ public class NettyRemotingServer implements RemotingServer {
 
     /**
      * 发送远程响应信息
+     *
      * @param channel
      * @param xid
      */
