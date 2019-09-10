@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnProperty(value = "rm.global.tx.enable", matchIfMissing = true)
-public class RMConfig {
+public class RMAutoConfiguration {
 
     @Bean
     public RemotingClient remotingClient() {
