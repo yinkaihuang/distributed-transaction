@@ -1,4 +1,4 @@
-package cn.bucheng.rm.config;
+package cn.bucheng.rm.autoconfiguration;
 
 import cn.bucheng.rm.aspect.DataSourceAspect;
 import cn.bucheng.rm.aspect.GlobalTransactionalAspect;

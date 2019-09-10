@@ -45,7 +45,7 @@ public class NettyRemotingClient implements RemotingClient {
     public static final int ROLLBACK_CODE = -2;
     public static final int COMMIT_CODE = 2;
     /**
-     * 保存请求结果集
+     * 保存请求结果集 键为xid 值为阻塞结果集
      */
     private ConcurrentHashMap<String, ResponseFuture> responseTable = new ConcurrentHashMap<String, ResponseFuture>(200);
     /**
