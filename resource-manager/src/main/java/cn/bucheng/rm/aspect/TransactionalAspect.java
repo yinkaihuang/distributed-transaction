@@ -14,7 +14,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 
-/**
+/**拦截存在@Transactional的方法，通过Order来保证拦截相同目标方法时，其执行顺序低于@GlobalTransactional高于其他
  * @author ：yinchong
  * @create ：2019/8/28 10:07
  * @description：
@@ -27,7 +27,6 @@ import org.springframework.core.annotation.Order;
 public class TransactionalAspect {
     public static final int REGISTER_TIMEOUT = 1000 * 10;
     public static final int ERROR_TIMEOUT = 1000 * 10;
-    @Autowired
     private RemotingClient client;
 
     public TransactionalAspect(RemotingClient client) {

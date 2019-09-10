@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version:
  */
 public class ConnectionProxyHolder {
+    //存放代理数据库对象缓存，键为Xid 值为代理连接
     private static ConcurrentHashMap<String, ConnectionProxyDefinition> proxyTable = new ConcurrentHashMap<>();
 
     public static void putProxy(String xid, ConnectionProxy proxy, long timeout) {

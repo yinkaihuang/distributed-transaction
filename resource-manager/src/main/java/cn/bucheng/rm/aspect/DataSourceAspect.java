@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 
-/**
+/**采用aop拦截获取数据库连接，通过Order保证拦截相同方法时，当前切面最后执行
  * @author ：yinchong
  * @create ：2019/8/28 9:49
  * @description：

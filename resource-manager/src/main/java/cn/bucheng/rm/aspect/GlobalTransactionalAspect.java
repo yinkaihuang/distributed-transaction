@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
+/**拦截存在@GlobalTransactional的方法，通过Order来保证多个拦截器执行时当前切面最先执行
  * @author ：yinchong
  * @create ：2019/8/28 10:05
  * @description：

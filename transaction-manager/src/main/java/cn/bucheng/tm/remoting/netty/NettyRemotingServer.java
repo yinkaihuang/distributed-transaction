@@ -57,7 +57,7 @@ public class NettyRemotingServer implements RemotingServer {
     private ConcurrentHashMap<String, RemotingDefinition> channelTimeoutTable = new ConcurrentHashMap<String, RemotingDefinition>();
 
     public void start() {
-        timer = new Timer("server-response-clear");
+        timer = new Timer("server-response-clearResources");
         TaskQueue queue = new TaskQueue(MAX_TASK_QUEUE);
         poolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, 10, TimeUnit.SECONDS, queue);
         queue.setParent(poolExecutor);
@@ -170,7 +170,7 @@ public class NettyRemotingServer implements RemotingServer {
                 log.info("receive remoting client:{} fin command,xid:{}", channel.remoteAddress(), xid);
                 boolean commit = isCommit(xid);
                 asyncSendRollbackOrCommit(xid, commit);
-                clear(xid);
+                clearResources(xid);
                 sendResponse(channel, xid);
                 break;
         }
@@ -190,7 +190,7 @@ public class NettyRemotingServer implements RemotingServer {
         }
 
         for (String xid : removeKeyList) {
-            clear(xid);
+            clearResources(xid);
         }
     }
 
@@ -234,7 +234,7 @@ public class NettyRemotingServer implements RemotingServer {
      *
      * @param xid
      */
-    private void clear(String xid) {
+    private void clearResources(String xid) {
         errorSet.remove(xid);
         remotingChannelTable.remove(xid);
         channelTimeoutTable.remove(xid);
