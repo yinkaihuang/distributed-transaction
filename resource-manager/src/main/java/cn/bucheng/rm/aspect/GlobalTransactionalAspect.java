@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Aspect
-@Component
 @Order(-Integer.MAX_VALUE)
 public class GlobalTransactionalAspect {
     public static final int REGISTER_TIMEOUT = 1000 * 10;

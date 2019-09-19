@@ -47,7 +47,7 @@ public interface RemotingClient {
     void invokeSync(final RemotingCommand command, final long timeoutMillis) throws InterruptedException, RemotingSendRequestException, RemotingTimeoutException, RemotingConnectException;
 
     /**
-     * 处理异常消息
+     * 处理消息
      * @param command
      */
     void handleRemotingCommand(RemotingCommand command) throws SQLException;

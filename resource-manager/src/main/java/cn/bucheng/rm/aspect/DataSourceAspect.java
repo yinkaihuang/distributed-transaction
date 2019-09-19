@@ -21,7 +21,6 @@ import java.sql.Connection;
  * @version:
  */
 @Slf4j
-@Component
 @Aspect
 @Order(Integer.MAX_VALUE)
 public class DataSourceAspect {

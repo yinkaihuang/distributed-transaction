@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
  * @version:
  */
 @Slf4j
-@Component
 public class NettyClientController implements CommandLineRunner {
     @Autowired
     private RemotingClient remotingClient;
